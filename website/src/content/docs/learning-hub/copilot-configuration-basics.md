@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -361,6 +361,29 @@ Settings file: `.vscode/settings.json` or global user settings
   "editor.inlineSuggest.enabled": true
 }
 ```
+
+#### BYOK (Bring Your Own Key) Models *(VS Code 1.128+, experimental)*
+
+VS Code 1.128 introduced **BYOK model support** for agent-host Copilot sessions. This lets you configure custom model endpoints — for example, Azure OpenAI or Anthropic deployments you control — alongside the standard GitHub-hosted models.
+
+With BYOK, you can:
+- Use your own Azure OpenAI, Anthropic, or compatible endpoint for Copilot Chat sessions
+- Configure a **default utility model** for BYOK, separate from your primary model
+- Set **sampling parameters** (`temperature`, `top_p`) for custom endpoint models to control response behavior
+
+Example VS Code settings for a custom endpoint:
+
+```json
+{
+  "github.copilot.chat.customEndpoint": {
+    "url": "https://your-azure-oai.openai.azure.com/openai/deployments/gpt-4o",
+    "temperature": 0.2,
+    "top_p": 0.9
+  }
+}
+```
+
+> **Note**: BYOK is currently experimental in VS Code. Configuration options and exact setting names may change as the feature matures. See the [VS Code 1.128 release notes](https://code.visualstudio.com/updates/v1_128) for full details.
 
 ### Visual Studio
 

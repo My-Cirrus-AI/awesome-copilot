@@ -3,7 +3,7 @@ title: 'Understanding Copilot Context'
 description: 'Learn how GitHub Copilot uses context from your code, workspace, and conversation to generate relevant suggestions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-07-12
 estimatedReadingTime: '8 minutes'
 tags:
   - context
@@ -50,6 +50,42 @@ Semantic context goes beyond raw text to understand the meaning and relationship
 In GitHub Copilot Chat, conversation context includes all previous messages, questions, and responses in the current chat session. This enables contextual follow-ups where you can ask "What about error handling?" and Copilot understands you're referring to the code discussed earlier.
 
 **Example**: After asking Copilot to generate a database query function, you can follow up with "Add error handling and logging" without repeating the full context—Copilot remembers the previous exchange.
+
+### Visual Context (Images & Documents)
+
+As of July 2026, **Copilot Vision is generally available** in GitHub Copilot Chat. You can attach images and PDF documents directly to your chat messages, giving Copilot visual context to work with alongside code.
+
+**Supported input types**:
+- **Images**: Screenshots, diagrams, UI mockups, error dialogs, hand-drawn sketches
+- **PDF documents**: API references, design specs, compliance docs, architecture diagrams
+
+**How to attach visual context**:
+- In VS Code: paste or drag-and-drop an image into the chat input, or use the attachment button
+- In GitHub Copilot app: use the attachment icon in the chat panel
+
+**Practical use cases**:
+
+| Scenario | How to Use |
+|----------|------------|
+| Bug reproduced via screenshot | Attach the screenshot and describe the expected behavior |
+| Design mockup to implement | Attach the Figma export and ask Copilot to generate the component |
+| Error screenshot | Attach the error dialog image and ask for a fix |
+| PDF architecture doc | Attach the PDF and ask Copilot to help implement a specific component |
+| Diagram to understand | Attach the diagram and ask "Walk me through this data flow" |
+
+**Example**:
+
+```
+[Attached: login-error-screenshot.png]
+
+The login form shows this error when users try to authenticate with SSO.
+Can you look at the screenshot and suggest what might be causing the
+"Invalid session token" error in my auth middleware?
+```
+
+Copilot analyzes the image alongside your code to provide context-aware suggestions.
+
+> **Note**: Visual attachments are available in GitHub Copilot Chat (VS Code, GitHub.com, and the Copilot app). The Copilot CLI also supports attachments via the `--attachment` flag in prompt mode.
 
 ### Workspace Context
 
@@ -170,3 +206,7 @@ Now that you understand how context works in GitHub Copilot, explore these relat
 - **[Copilot Configuration Basics](../copilot-configuration-basics/)** - Configure settings to optimize context usage
 - **[Creating Effective Skills](../creating-effective-skills/)** - Use context effectively in your skills
 - **Common Pitfalls and Solutions** _(coming soon)_ - Avoid context-related mistakes
+
+## Further Reading
+
+- **[Copilot Vision is generally available](https://github.blog/changelog/2026-07-01-copilot-vision-is-generally-available/)** — Official announcement of multimodal image and PDF support in Copilot Chat
