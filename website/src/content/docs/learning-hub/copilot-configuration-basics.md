@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -413,6 +413,32 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+### Repository-Pinned Model Settings (v1.0.70+)
+
+For stronger team consistency, a trusted repository can enforce the **model, reasoning effort level, and context tier** via `.github/copilot/settings.json`. This file is committed to version control and takes precedence over a user's local defaults:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "urlDenyList": ["https://internal.example.com/*"],
+  "mcpDenyList": ["untrusted-server"],
+  "skillDenyList": ["legacy-skill"]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `model` | Pin the default model for all sessions in this repository |
+| `effortLevel` | Pin the default reasoning effort (`low`, `medium`, `high`) |
+| `contextTier` | Pin the context window tier (`default` or `long_context`) |
+| `urlDenyList` | Extend the per-user URL deny list with repo-specific blocked URLs |
+| `mcpDenyList` | Block specific MCP servers from loading in this repository |
+| `skillDenyList` | Prevent specific skills from loading in this repository |
+
+This is useful for repositories that require high-accuracy reasoning by default, or where security policies mandate that certain MCP servers or external URLs must never be accessed.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -534,6 +560,23 @@ The interval can be specified in seconds (`s`), minutes (`m`), or hours (`h`), a
 > **Experimental**: `/every`, `/loop`, and `/after` are part of the experimental feature set. They appear in the `/experimental` slash command list — enable experimental features if they are not already visible in your current session.
 
 > **Note**: Scheduled prompts run in the background of the current session and use your active model. They share the session context window, so very frequent scheduling with long responses may consume context rapidly. Use `/compact` if context usage becomes a concern.
+
+### Refining Prompts with /refine (v1.0.70+)
+
+The `/refine` command rewrites a rough, stream-of-consciousness prompt into a clear, focused one — without changing what you're asking for:
+
+```
+/refine
+```
+
+Start typing (or paste) a messy prompt and press Enter. The CLI rewrites it into a well-structured prompt and displays the result. You can then accept it, edit it further, or discard it if it doesn't match your intent.
+
+`/refine` is useful when:
+- You've quickly jotted down a vague idea and want it tightened before sending
+- You're building a reusable prompt and want a cleaner starting point
+- You want to ensure the model gets a precise, unambiguous instruction
+
+The original prompt is preserved in your session history so you can always refer back to the raw version.
 
 The `/pr auto` command *(v1.0.66+)* starts a self-paced automation loop that drives the current pull request to CI green. Rather than running continuously, it fixes one failing item per run and paces itself around CI checks to avoid redundant work:
 
