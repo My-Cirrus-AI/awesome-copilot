@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -165,10 +165,29 @@ A well-organized Copilot configuration directory looks like this:
 │   │   └── SKILL.md
 │   └── refactor-component/
 │       └── SKILL.md
-└── instructions/
-    ├── typescript-conventions.instructions.md
-    └── api-design.instructions.md
+├── instructions/
+│   ├── typescript-conventions.instructions.md
+│   └── api-design.instructions.md
+└── copilot/
+    └── settings.json              # Repository-managed model/settings pins (v1.0.70+)
 ```
+
+### Repository-Managed Settings (`.github/copilot/settings.json`)
+
+*(v1.0.70+)* A trusted repository can pin the model, reasoning effort level, and context tier for all sessions within that repository — and extend the URL, MCP server, and skill deny lists — by adding a `.github/copilot/settings.json` file:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "large",
+  "denyUrls": ["http://internal-only.example.com"],
+  "denyMcpServers": ["untrusted-server"],
+  "denySkills": ["blocked-skill"]
+}
+```
+
+This is especially useful for teams that want all contributors to use the same model and effort settings without relying on individual user config, or for security-conscious environments that need consistent deny lists enforced across the codebase.
 
 ### Monorepo Support
 
@@ -578,6 +597,14 @@ The `/diagnose` command (v1.0.64+) analyzes the current session's logs and surfa
 
 Use `/diagnose` when a session is behaving unexpectedly — it inspects session logs and reports what it finds, making it easier to share diagnostics with support or understand what happened internally.
 
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. Useful when you know what you want to accomplish but aren't sure how to phrase it precisely:
+
+```
+/refine fix the thing where the login doesn't work right when you have a really long email and also it should remember you
+```
+
+The CLI takes your raw description, analyzes your intent, and produces a refined prompt you can review and send. This is helpful for complex requests where a cleaner prompt will yield better results from the model.
+
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
@@ -696,6 +723,15 @@ copilot --autopilot --max-autopilot-continues 10 "Refactor the authentication mo
 ```
 
 Set it higher for long-running tasks, or lower for tasks where you want more frequent checkpoints. Setting it to `0` disables automatic continuation entirely.
+
+The `--sandbox` and `--no-sandbox` flags *(v1.0.70+)* turn the OS-level shell sandbox on or off for the current session only, without changing your saved sandbox setting. This is particularly useful with `-p` (prompt mode) for one-off tasks where you need to temporarily adjust sandbox behavior:
+
+```bash
+copilot --sandbox -p "Run the full test suite"       # enable sandbox for this run
+copilot --no-sandbox -p "Build with native tools"    # disable sandbox for this run
+```
+
+Unlike editing your persistent sandbox setting in `/settings`, these flags only affect the current invocation. Your default sandbox configuration is preserved for future sessions.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 
