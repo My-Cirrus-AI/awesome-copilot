@@ -3,7 +3,7 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-15
 estimatedReadingTime: '8 minutes'
 tags:
   - glossary
@@ -12,6 +12,7 @@ tags:
 relatedArticles:
   - ./what-are-agents-skills-instructions.md
   - ./copilot-configuration-basics.md
+  - ./using-copilot-spaces.md
 ---
 
 New to GitHub Copilot customization? This glossary defines common terms you'll encounter while exploring agents, skills, instructions, and related concepts in the Awesome GitHub Copilot ecosystem.
@@ -247,9 +248,57 @@ An installable package that extends GitHub Copilot CLI with a bundled set of age
 
 ---
 
-### Tools
+### Copilot Space
 
-Capabilities that GitHub Copilot can invoke to perform actions or retrieve information. Tools fall into two categories:
+A named, curated knowledge base that bundles repositories, files, GitHub issues, free-text notes, and custom instructions into a single shareable context unit. When loaded into a Copilot session, the Space grounds responses in your team's actual code, documentation, and internal standards — without requiring you to paste context into every conversation.
+
+Spaces can be owned by individual users or organizations, and can be kept private or made public for broader sharing. They auto-update as the underlying repositories and issues change.
+
+**When to use**: When you need Copilot to answer questions about internal documentation, follow team-specific patterns, or execute repeatable workflows using curated context.
+
+**Learn more**: [Using Copilot Spaces](../using-copilot-spaces/)
+
+**Related terms**: [MCP](#mcp-model-context-protocol), [Instruction](#instruction)
+
+---
+
+### Canvas
+
+An interactive work surface within the GitHub Copilot app where you and agents collaborate in real time. Instead of a linear chat thread, a canvas shows the actual work — a plan, a diff, a terminal session, or a live browser view — that agents update as they make progress. You can edit, approve, or redirect directly on the canvas surface.
+
+**When to use**: When working on complex, multi-step tasks where you want to see the agent's progress and intervene mid-task.
+
+**Learn more**: [Working with Canvas Extensions](../working-with-canvas-extensions/), [Getting Started with the GitHub Copilot app](../github-copilot-app/)
+
+**Related terms**: [Coding Agent](#coding-agent)
+
+---
+
+### Agent Merge
+
+A feature in the GitHub Copilot app that automates the pull request lifecycle. Agent Merge monitors CI/CD pipelines, waits for required reviewers, addresses failing checks or linting errors, and can automatically merge a PR when all conditions are satisfied. The level of automation is user-configurable — from only running CI to going all the way to auto-merge.
+
+**When to use**: When you want Copilot to handle the repetitive parts of the review-and-merge process so you can focus elsewhere.
+
+**Learn more**: [Getting Started with the GitHub Copilot app](../github-copilot-app/)
+
+**Related terms**: [Coding Agent](#coding-agent), [Hook](#hook)
+
+---
+
+### Agentic Workflow
+
+A GitHub Actions automation written in Markdown that runs a Copilot coding agent on a schedule, in response to a repository event, or via a slash command. The `.md` source file combines YAML frontmatter (triggers, permissions, safe outputs) with natural language instructions the agent follows at runtime. A companion `gh aw` CLI compiles the source into a `.lock.yml` Actions workflow file.
+
+**Example**: A `daily-issues-report.md` workflow that runs every weekday, summarizes open issues, and creates a report issue — without any YAML Actions syntax.
+
+**When to use**: For autonomous, event-driven automation that requires reasoning or summarization — tasks that go beyond what static GitHub Actions steps can do.
+
+**Learn more**: [Agentic Workflows](../agentic-workflows/)
+
+**Related terms**: [Coding Agent](#coding-agent), [Hook](#hook)
+
+--- to perform actions or retrieve information. Tools fall into two categories:
 
 1. **Built-in tools**: Native capabilities like `codebase` (code search), `terminalCommand` (running commands), and `web` (web search)
 2. **MCP tools**: External integrations provided by MCP servers (e.g., database queries, cloud resource management, or API calls)
