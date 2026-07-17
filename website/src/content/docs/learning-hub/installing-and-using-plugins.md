@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-17
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -129,7 +129,7 @@ Because `awesome-copilot` is a default marketplace in VS Code, you can discover 
 - Open the **Extensions** search view and type **`@agentPlugins`** to see all available plugins
 - Or open the **Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run **Chat: Plugins**
 
-### Adding More Marketplaces
+### Adding and Removing Marketplaces
 
 Register additional marketplaces from GitHub repositories:
 
@@ -142,6 +142,14 @@ Or from a local path:
 ```bash
 copilot plugin marketplace add /path/to/local-marketplace
 ```
+
+To remove a marketplace you no longer need:
+
+```bash
+copilot plugin marketplace remove anthropics/claude-code
+```
+
+Removing a marketplace de-registers it from your configuration but does not uninstall any plugins you already installed from it.
 
 ### Sharing Marketplace Registrations Across a Team
 
