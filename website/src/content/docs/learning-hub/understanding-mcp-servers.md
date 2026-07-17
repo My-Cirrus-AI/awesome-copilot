@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-17
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -146,6 +146,28 @@ The available RPCs are:
 | `mcp.config.remove` | Remove a server from the persistent configuration |
 
 These are especially useful for plugins and installer scripts that need to self-register or de-register their MCP server as part of install/uninstall flows, without requiring the user to manually edit config files.
+
+### Persisting GitHub MCP Tool Configuration
+
+The **built-in GitHub MCP server** gives agents access to GitHub APIs (repositories, issues, pull requests, and more). You can fine-tune which toolsets and individual tools are available, and as of **v1.0.71** these preferences are persisted to your `settings.json` so they survive restarts.
+
+Configure the built-in GitHub MCP server via `settings.json`:
+
+```json
+{
+  "githubMcpToolsets": ["repos", "issues"],
+  "githubMcpTools": ["create_issue", "list_pull_requests"],
+  "githubMcpDisabledTools": ["delete_repository"]
+}
+```
+
+| Setting | Description |
+|---------|-------------|
+| `githubMcpToolsets` | Allowlist of toolset groups to enable (e.g., `repos`, `issues`, `pull_requests`) |
+| `githubMcpTools` | Individual tools to enable (additive with toolsets) |
+| `githubMcpDisabledTools` | Individual tools to explicitly disable |
+
+You can also pass `--add-github-mcp-tool "*"` on the command line to enable **all** GitHub MCP tools for a session, which is useful when exploring what's available. Use `settings.json` for persistent per-environment configuration.
 
 ### Common MCP Server Configurations
 
