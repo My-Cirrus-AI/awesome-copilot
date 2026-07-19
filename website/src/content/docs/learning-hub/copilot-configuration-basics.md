@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -504,21 +504,26 @@ The `/cd` command changes the working directory for the current session. Since v
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
 
-The `/worktree` command (v1.0.61+, also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
+The `/worktree` and `/move` commands let you work on parallel branches from a single terminal session. In v1.0.71+, these two commands have distinct behaviors:
+
+- **`/worktree`** creates a new git worktree on a new branch and switches into it, **leaving your uncommitted changes behind** in the current worktree. Use this when you want to start a fresh context while keeping your current work in progress where it is.
+- **`/move`** creates a new git worktree on a new branch and **carries your uncommitted changes** into the new worktree. Use this when you want to continue your current edits on a separate branch.
 
 ```
-/worktree my-feature-branch
+/worktree my-feature-branch     # switch to new worktree, leave changes here
+/move my-feature-branch         # move to new worktree, carry changes along
 ```
 
-In v1.0.66+, you can pass a task description to `/worktree` to name the branch from the task and immediately run the task as the first prompt in the new worktree — all in one step:
+In v1.0.66+, you can pass a task description to either command to name the branch from the task and immediately begin working on it:
 
 ```
 /worktree fix the login redirect
+/move fix the login redirect
 ```
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
-After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+After the command runs, the session is inside the new worktree. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -689,6 +694,8 @@ copilot --plan          # start in plan mode (propose without executing)
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 
+In **plan mode** (v1.0.71+), Copilot hard-blocks any built-in tool call that would modify the workspace — the agent cannot edit files or run mutating shell commands while planning. Built-in mutators like opening a pull request are blocked; MCP and external tools are still permitted. This ensures plan mode remains strictly read-only for built-in workspace operations, so you can review a proposed plan with confidence that no changes have already been made.
+
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 
 ```bash
@@ -706,6 +713,14 @@ copilot -p "Summarize the architecture shown in these diagrams" \
 ```
 
 This is useful in automated pipelines where you want to pass visual or document context (screenshots, design specs, PDF reports) to the model without interactive file selection. Multiple `--attachment` flags can be specified to include several files at once.
+
+The `/voice devices` command *(v1.0.71+)* lets you choose and persist which microphone to use for voice input in Copilot CLI. If you have multiple audio input devices (for example, a built-in mic and a headset), you can select the preferred one and Copilot will remember it across sessions:
+
+```
+/voice devices
+```
+
+This opens a picker listing your available audio input devices. The selected device is saved to your settings so you don't need to reconfigure it each time.
 
 The `COPILOT_HOME` environment variable sets the Copilot CLI configuration directory. It is the preferred replacement for the `--config-dir` flag, which is deprecated:
 
