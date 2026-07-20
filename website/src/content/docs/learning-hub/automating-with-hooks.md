@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-25
+lastUpdated: 2026-07-20
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -94,7 +94,7 @@ Hooks can trigger on several lifecycle events:
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
-| `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
+| `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes; receives `stop_hook_active` flag when loop-limiting is active (v1.0.72+) |
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
@@ -368,6 +368,20 @@ Run ESLint after the agent finishes responding and block if there are errors:
 ```
 
 If the lint command exits with a non-zero status, the action is blocked.
+
+> **Loop protection (v1.0.72+)**: If an `agentStop` hook always blocks, the CLI ends the turn after **8 consecutive blocks** to prevent an infinite loop. When loop-limiting kicks in, the hook's JSON input will contain `"stop_hook_active": true`. Use this flag in your script to self-limit or emit a final diagnostic instead of blocking again:
+>
+> ```bash
+> #!/usr/bin/env bash
+> INPUT=$(cat)
+> if echo "$INPUT" | jq -e '.stop_hook_active == true' > /dev/null 2>&1; then
+>   # Forced continuation — log and allow instead of blocking
+>   echo '{"decision":"approve","additionalContext":"Loop limit reached; skipping lint block."}'
+>   exit 0
+> fi
+> # Normal lint check
+> npx eslint . --max-warnings 0
+> ```
 
 ### Security Gating with preToolUse
 
