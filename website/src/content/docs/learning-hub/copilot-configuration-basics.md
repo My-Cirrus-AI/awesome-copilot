@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-23
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -278,6 +278,27 @@ When writing TypeScript code:
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
 
+### Repository-Pinned Model and Settings *(v1.0.70+)*
+
+Repositories can lock the model, reasoning effort level, and context tier for all sessions that open within them — and can also extend the URL, MCP server, and skill deny lists. Place a `settings.json` file at `.github/copilot/settings.json` to enforce these constraints for everyone working in the repository:
+
+```json
+{
+  "model": "claude-sonnet-4-5",
+  "effortLevel": "medium",
+  "contextTier": "default",
+  "denyList": {
+    "urls": ["http://internal-only.example.com"],
+    "mcpServers": ["dangerous-server"],
+    "skills": ["unpublished-skill"]
+  }
+}
+```
+
+This is useful for teams that want consistent, predictable AI behavior across a project — for example, fixing the model and effort level for reproducibility in CI-driven agentic workflows, or restricting which external services the agent is allowed to reach.
+
+> **Note**: Repository settings can pin the model and effort level, but users can still override these with `/model --session` to change settings for just the current session without modifying the saved configuration.
+
 ## Setting Up Team Configuration
 
 Follow these steps to establish effective team-wide Copilot configuration:
@@ -504,7 +525,7 @@ The `/cd` command changes the working directory for the current session. Since v
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
 
-The `/worktree` command (v1.0.61+, also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
+The `/worktree` command (v1.0.61+) creates a new git worktree and switches into it, **leaving your uncommitted changes in the current worktree**. This lets you start working on a parallel branch without leaving your current terminal session:
 
 ```
 /worktree my-feature-branch
@@ -519,6 +540,8 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+> **v1.0.71+**: `/worktree` and `/move` are now **separate commands** with distinct behaviors. `/worktree` leaves your uncommitted changes behind in the current worktree. The `/move` command creates a new worktree and **carries your uncommitted changes into it** — useful when you realize mid-task that your changes belong on a fresh branch.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -617,6 +640,16 @@ The `/compact` command summarizes the conversation history to free up context wi
 ```
 
 > **Note**: Skills remain loaded and effective after `/compact`. You do not need to re-invoke them after compacting.
+
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clearer, more precise one before sending it. Use it when you want to improve a complex prompt without losing your intent:
+
+```
+/refine
+```
+
+Run `/refine` after typing a draft prompt to have Copilot restructure it into a well-formed request. This is particularly useful for complex multi-step tasks where a well-phrased prompt leads to significantly better results.
+
+**Interactive shell shortcut** *(v1.0.72+)*: Type `$` at the prompt to open an interactive shell in the current session directory, without switching to shell mode first. Enable this shortcut with `/settings shellShortcut on` (off by default). This is a fast alternative to typing `!` when you need to run a quick command mid-session.
 
 > **ACP sessions (v1.0.39+)**: The `/compact`, `/context`, `/usage`, and `/env` commands are now available in ACP (Agent Coordination Protocol) sessions, allowing remote ACP clients to surface session details and manage context from within their own automated workflows.
 
