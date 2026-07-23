@@ -3,7 +3,7 @@ title: 'Getting Started with the GitHub Copilot app'
 description: 'Learn about the GitHub Copilot app, a desktop experience built for agent-native development. Understand its key features and who it''s for.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-07-23
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -233,6 +233,20 @@ To give Copilot access to your repositories:
 2. Click **Add Repository** and select repositories from your GitHub account
 3. Grant the necessary permissions
 4. The app now has access to your code, issues, and pull requests
+
+## VS Code Integration: Agent Host Architecture
+
+**VS Code 1.130 (July 2026)** introduced the [Agent Host](https://code.visualstudio.com/docs/agents/concepts/agent-host) — a dedicated background process that runs agent sessions (Copilot, Claude, Codex) independently from VS Code windows. The Copilot agent on the agent host is powered by the same [Copilot SDK](https://www.npmjs.com/package/@github/copilot-sdk) that drives the Copilot CLI and the standalone Copilot app, meaning behavior and features stay aligned across all surfaces.
+
+**Key improvements with the agent host**:
+
+- **Multi-window sessions**: The same agent session can be connected to and rendered from multiple VS Code windows simultaneously — useful for pairing or monitoring on a second display.
+- **Worktree support for all harnesses** *(v1.130+)*: Git worktree isolation (the **New Worktree** checkbox in the Agents window) now works for Claude and Codex sessions in addition to Copilot, making it easy to run parallel sessions across different harnesses.
+- **Assisted tool approvals** (`chat.assistedPermissions.enabled`): With this setting enabled, the language model evaluates the risk of each tool call and decides whether it can run automatically or should prompt for your approval. This reduces interruptions during long-running agent tasks while keeping risky operations visible.
+
+To opt in, enable `chat.agentHost.enabled` in VS Code settings and select a harness from the dropdown.
+
+> **Learn more**: [VS Code Agent Host documentation](https://code.visualstudio.com/docs/agents/concepts/agent-host) | [VS Code 1.130 release notes](https://code.visualstudio.com/updates/v1_130)
 
 ## Using the Copilot App with Your Custom Configuration
 
